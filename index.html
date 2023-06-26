@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CiteLight</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.6/fuse.min.js"></script>
+    <script src="citelight.js"></script>
+    <style>
+        .new-paper {
+            background-color: #c8ffbe;
+        }
+        #progressBar {
+            height: 30px;
+            position: relative;
+            color: black;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        #foundationalPapers, #similarPapers {
+            margin-top: 30px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center">
+            <h1>Welcome to CiteLight</h1>
+            <p class="lead">
+                Welcome to CiteLight, your personal research assistant. We're here to augment your research by identifying foundational papers in your field of study and revealing similar recent works that might not be in your existing collection.
+            </p>
+            <p class="lead">
+                Any papers not currently in your BibTeX file are highlighted in green. The number next to each foundational paper represents how many papers from your uploaded file reference it. Similarly, the number next to each similar paper indicates how many of your papers are cited by this similar work.
+            </p>
+            <p class="lead">
+                Rest assured, all operations are performed locally in your browser. Information is sourced from <a href="https://www.semanticscholar.org/" target="_blank">Semantic Scholar</a>. If you have any questions or suggestions, feel free to get in touch at <a href="mailto:samy@samyateia.de">samy@samyateia.de</a>.
+            </p>
+        </header>
+
+        <section>
+            <h2>Upload Your BibTeX File</h2>
+            <input type="file" id="fileInput" class="form-control" onchange="handleFileUpload(event)">
+            <div class="progress" id="progressBar">
+                <div class="progress-bar" role="progressbar" id="progressBarFill" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <span id="progressBarText" class="small"></span>
+            <div id="spinner" class="spinner" style="display: none;"></div>
+        </section>
+
+        <section id="foundationalPapers">
+            <h2>Foundational Papers</h2>
+            <div id="foundationalResults"></div>
+        </section>
+
+        <section id="similarPapers">
+            <h2>Similar Papers</h2>
+            <div id="similarResults"></div>
+        </section>
+    </div>
+</body>
+</html>

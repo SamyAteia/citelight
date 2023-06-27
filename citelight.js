@@ -1,8 +1,10 @@
 // citelight.js
+const Cite = require('citation-js');
+
 async function handleFileUpload(event) {
     const file = event.target.files[0];
     const text = await file.text();
-    const entries = parseBibTeX(text);
+    const entries = await parseBibTeX(text);
 
     const originalTitles = entries.map(entry => entry.title);
 
@@ -64,7 +66,6 @@ function isSamePaper(title, originalTitles) {
     return false;
 }
 
-
 function displayPapers(papers, elementId) {
     const element = document.getElementById(elementId);
     const sortedPapers = Object.entries(papers).sort((a, b) => b[1].count - a[1].count).slice(0, 20);
@@ -88,49 +89,11 @@ function updateProgressBar(current, total) {
     textElement.textContent = `${current} / ${total} papers processed`;
 }
 
-
-
-function parseBibTeX(text) {
-    const entries = text.split('@');
-    const titles = [];
-
-    for (let entry of entries) {
-        if (!entry) continue;
-        // Re-add the "@" character that was removed by the split operation
-        entry = "@" + entry;
-        // Remove unnecessary spaces and line breaks
-        entry = entry.replace(/\s+/g, ' ').trim();
-        // Check if the line starts a new entry
-        if (entry.startsWith('@')) {
-            // Extract the title - it's the text within the title field
-            const titleStartIndex = entry.indexOf('title={');
-            if (titleStartIndex === -1) {
-                continue; // No title field in this entry
-            }
-            let balance = 0;
-            let titleEndIndex = titleStartIndex + 'title={'.length;
-
-            // Count the number of `{` and `}` characters, to correctly find the end of the title
-            for (; titleEndIndex < entry.length; ++titleEndIndex) {
-                if (entry[titleEndIndex] === '{') {
-                    ++balance;
-                } else if (entry[titleEndIndex] === '}') {
-                    if (balance === 0) {
-                        break;
-                    }
-                    --balance;
-                }
-            }
-
-            const title = entry.slice(titleStartIndex + 'title={'.length, titleEndIndex).trim();
-            titles.push({title: title});
-        }
-    }
-
+async function parseBibTeX(text) {
+    const cite = new Cite(text);
+    const titles = cite.data.map(entry => ({ title: entry.title }));
     return titles;
 }
-
-
 
 async function getPaperData(title) {
     // Construct the API request URL
